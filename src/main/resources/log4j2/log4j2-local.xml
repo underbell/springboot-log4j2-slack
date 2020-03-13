@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" packages="com.github.underbell.slack.utils" shutDownHook="disable">
+    <Properties>
+        <Property name="LOG_EXCEPTION_CONVERSION_WORD">%xwEx</Property>
+        <Property name="LOG_LEVEL_PATTERN">%5p</Property>
+        <Property name="LOG_DATEFORMAT_PATTERN">yyyy-MM-dd HH:mm:ss.SSS</Property>
+        <Property name="CONSOLE_LOG_PATTERN">%clr{%d{${LOG_DATEFORMAT_PATTERN}}}{faint} %clr{${LOG_LEVEL_PATTERN}} %clr{%pid}{magenta} %clr{---}{faint} %clr{[%15.15t]}{faint} %clr{%-40.40c{1.}}{cyan} %clr{:}{faint} %m%n${sys:LOG_EXCEPTION_CONVERSION_WORD}</Property>
+    </Properties>
+    <Appenders>
+        <Console name="LogToConsole" target="SYSTEM_OUT" follow="true">
+            <PatternLayout pattern="${sys:CONSOLE_LOG_PATTERN}" />
+        </Console>
+
+        <Slack name="LogToSlack"
+               url="https://hooks.slack.com/services/xxxxxxx"
+               channel="#test1"
+               username="app">
+            <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/>
+        </Slack>
+
+        <Async name="AsyncLogToSlack" includeLocation="true">
+            <AppenderRef ref="LogToSlack"/>
+        </Async>
+    </Appenders>
+    <Loggers>
+        <Logger name="org.springframework.web" level="info"  />
+        <Logger name="com.github.underbell" level="debug" />
+        <Root level="info">
+            <AppenderRef ref="LogToConsole" />
+            <AppenderRef ref="AsyncLogToSlack" />
+        </Root>
+    </Loggers>
+</Configuration>
