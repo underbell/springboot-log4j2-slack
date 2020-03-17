@@ -94,7 +94,7 @@ public class SlackAppender extends AbstractAppender {
                                 .addHandlerLast(new WriteTimeoutHandler(3)));
 
         WebClient slackWebClient = WebClient.builder()
-                .clientConnector(new ReactorClientHttpConnector(HttpClient.from(tcpClient)))
+                .clientConnector(new ReactorClientHttpConnector(HttpClient.from(tcpClient).compress(true)))
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
 
@@ -117,7 +117,7 @@ public class SlackAppender extends AbstractAppender {
             attachment.text = getLayout().toSerializable(event).toString();
             slackMessage.attachments.add(attachment);
 
-            slackWebClient.post().uri(url).bodyValue(slackMessage).exchange().subscribe();
+            slackWebClient.post().uri(url).bodyValue(slackMessage).retrieve().bodyToMono(Void.class).subscribe();
         }
     }
 }
